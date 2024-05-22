@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voting System</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #votingSection {
+            margin-top: 20px;
+        }
+        .table thead th {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-vote {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-vote:disabled {
+            background-color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div id="votingSection" class="d-none">
+            <h2 class="text-center mb-4">Voting Table</h2>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th scope="col">Candidate</th>
+                        <th scope="col">Vote</th>
+                    </tr>
+                </thead>
+                <tbody id="votingTableBody">
+                    <!-- Voting rows will be inserted here by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const votingSection = document.getElementById('votingSection');
+            const votingTableBody = document.getElementById('votingTableBody');
+            const beepSound = new Audio('beep.mp3');
+            let votingAllowed = localStorage.getItem('votingAllowed') === 'true';
+            let hasVoted = localStorage.getItem('hasVoted') === 'true';
+            let candidates = ['Candidate 1', 'Candidate 2', 'Candidate 3'];
+
+            if (votingAllowed && !hasVoted) {
+                votingSection.classList.remove('d-none');
+                populateVotingTable();
+            } else if (hasVoted) {
+                alert('You have already voted.');
+            }
+
+            // Populate voting table with candidates
+            function populateVotingTable() {
+                votingTableBody.innerHTML = '';
+                candidates.forEach((candidate, index) => {
+                    let row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${candidate}</td>
+                        <td><button class="btn btn-vote" data-candidate="${candidate}" onclick="castVote('${candidate}', ${index})">Vote</button></td>
+                    `;
+                    votingTableBody.appendChild(row);
+                });
+            }
+
+            // Cast a vote
+            window.castVote = function(candidate, index) {
+                if (votingAllowed && !hasVoted) {
+                    hasVoted = true;
+                    localStorage.setItem('hasVoted', 'true');
+                    beepSound.play();
+                    alert(`Vote cast for ${candidate}`);
+                    document.querySelectorAll('.btn-vote')[index].disabled = true;
+                    // Simulate storing the vote in a spreadsheet
+                    console.log(`Stored vote for ${candidate}`);
+                } else {
+                    alert('Voting is not allowed or you have already voted.');
+                }
+            };
+        });
+    </script>
+</body>
+</html>
